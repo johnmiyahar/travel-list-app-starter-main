@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 function Logo() {
-  return <h1>My Travel List</h1>;
+  return <h1>Travel List</h1>;
 }
 
 function Form({ addItem }) {
@@ -57,7 +57,7 @@ function Item({ item, onDeleteItem, onUpdateItem }) {
     <li>
       <input
         type="checkbox"
-        value={item.packed}
+        checked={item.packed}
         onChange={() => onUpdateItem(item.id)}
       />
       <span
@@ -110,6 +110,7 @@ function App() {
     { id: 1, description: "Shirt", quantity: 5, packed: false },
     { id: 2, description: "Pants", quantity: 2, packed: false },
   ]);
+  const [sortOption, setSortOption] = useState("alphabetical"); // Alphabetical is the default
 
   const addItem = (item) => {
     setItems((prevItems) => [item, ...prevItems]);
@@ -127,16 +128,32 @@ function App() {
     );
   };
 
+  // Sorting function
+  const sortedItems = [...items]
+    .sort((a, b) => {
+      if (sortOption === "alphabetical") {
+        return a.description.localeCompare(b.description);
+      } else if (sortOption === "quantity") {
+        return a.quantity - b.quantity;
+      }
+      return 0;
+    })
+    .sort((a, b) => a.packed - b.packed); // Move packed items to the end
+
   return (
     <div className="app">
       <Logo />
       <Form addItem={addItem} />
+      <div className="sort-buttons">
+        <button onClick={() => setSortOption("alphabetical")}>Alphabetical</button>
+        <button onClick={() => setSortOption("quantity")}>Quantity</button>
+      </div>
       <PackingList
-        items={items}
+        items={sortedItems}
         onDeleteItem={handleDeleteItem}
         onUpdateItem={handleUpdateItem}
       />
-      <Stats items={items} />
+      <Stats items={sortedItems} />
     </div>
   );
 }
